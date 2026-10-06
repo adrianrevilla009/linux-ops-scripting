@@ -1,0 +1,4 @@
+# /etc/cron.d/orders-cleanup - same job as orders-cleanup.timer
+SHELL=/bin/sh
+PATH=/usr/bin:/bin
+30 2 * * * orders /usr/bin/find /var/lib/orders-api/exports -type f -mtime +7 -delete

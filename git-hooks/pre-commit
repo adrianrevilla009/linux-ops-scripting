@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Pre-commit: block staged secrets-looking strings and shell syntax errors.
+set -euo pipefail
+
+staged=$(git diff --cached --name-only --diff-filter=ACM)
+[[ -n $staged ]] || exit 0
+
+status=0
+pattern='(AKIA[0-9A-Z]{16}|-----BEGIN (RSA |EC )?PRIVATE KEY-----|ghp_[A-Za-z0-9]{30,})'
+if git diff --cached -U0 | grep -E '^\+' | grep -Eq "$pattern"; then
+  echo "pre-commit: possible secret in staged changes" >&2
+  status=1
+fi
+
+while IFS= read -r f; do
+  case $f in
+    *.sh) bash -n "$f" || status=1 ;;
+  esac
+done <<< "$staged"
+
+exit "$status"

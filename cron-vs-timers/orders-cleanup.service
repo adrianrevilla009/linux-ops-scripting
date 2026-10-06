@@ -1,0 +1,10 @@
+[Unit]
+Description=Purge expired Orders exports
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/find /var/lib/orders-api/exports -type f -mtime +7 -delete
+DynamicUser=yes
+StateDirectory=orders-api
+ProtectSystem=strict
+NoNewPrivileges=yes
